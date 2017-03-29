@@ -126,18 +126,18 @@ CREATE TABLE armor (
 
 
 INSERT INTO game_character(char_name, id, description) VALUES
-	('name', 1, 'female human'),
-	('name', 2, 'male human'),
-	('name', 3, 'female elf'),
-	('name', 4, 'male half-elf'),
-	('name', 5, 'male dwarf'),
-	('name', 6, 'female half-orc'),
-	('name', 7, 'female halfling'),
-	('name', 8, 'female half-elf'),
-	('name', 9, 'male elf'),
-	('name', 10, 'male elf'),
-	('name', 11, 'male dwarf'),
-	('name', 12, 'male halfling');
+	('Besma', 1, 'female human'),
+	('Kenneth', 2, 'male human'),
+	('Gudris', 3, 'female elf'),
+	('Arnor', 4, 'male half-elf'),
+	('Sergei', 5, 'male dwarf'),
+	('Duvamil', 6, 'female half-orc'),
+	('Tosti', 7, 'female halfling'),
+	('Asfrid', 8, 'female half-elf'),
+	('Kalf', 9, 'male elf'),
+	('Gunnlum', 10, 'male elf'),
+	('Boled', 11, 'male dwarf'),
+	('Hallfred', 12, 'male halfling');
 	
 INSERT INTO item(char_id, num, item_name, weight, description) VALUES
 	(1, 1, 'Padded Armor', 10, 'light, stealth disadvantage'),
@@ -154,7 +154,6 @@ INSERT INTO item(char_id, num, item_name, weight, description) VALUES
 	(1, 2, 'Club', 2, 'light'),
 	(2, 2, 'Dagger', 1, 'finesse, light, thrown'),
 	(4, 2, 'Greatclub', 10, 'two-handed'),
-	(5, 2, 'Light Hammer', 2, 'light, thrown'),
 	(6, 3, 'Shortsword', 2, 'finesse, light'),
 	(8, 2, 'Sickle', 2, 'light'),
 	(9, 2, 'Handaxe', 2, 'light, thrown'),
@@ -196,7 +195,8 @@ INSERT INTO spell(id, spell_name, description) VALUES
 	(2, 'Lightning', '100 feet, 48 damage'),
 	(3, 'Control Water', 'Concentration, 10 minutes'),
 	(4, 'Healing Word', '60 feet, 4 healing'),
-	(5, 'Invisibility', 'Conventration, 1 hour');
+	(5, 'Invisibility', 'Conventration, 1 hour'),
+	(6, 'Wish', 'Instantanious, no range');
 	
 INSERT INTO char_spell(char_id, spell_id) VALUES
 	(1, 1),
@@ -204,14 +204,12 @@ INSERT INTO char_spell(char_id, spell_id) VALUES
 	(2, 3),
 	(2, 5),
 	(3, 1),
-	(3, 2),
 	(3, 3),
 	(4, 3),
 	(4, 4),
 	(4, 5),
 	(5, 2),
 	(5, 3),
-	(7, 2),
 	(8, 1),
 	(8, 2),
 	(8, 3),
@@ -220,7 +218,7 @@ INSERT INTO char_spell(char_id, spell_id) VALUES
 	(10, 4),
 	(10, 5),
 	(12, 1),
-	(12, 2);
+	(12, 3);
 	
 INSERT INTO party(id, party_name, color) VALUES
 	(1, 'Players', '00ff00'),
@@ -277,104 +275,462 @@ INSERT INTO association(party_id, org_id, relation) VALUES
 * SQL Queries *
 ***************
 
-	1. Queries that show that constraints(primary key, foreign key, unique, and check) are enforced.
+	1-2. Queries that show that constraints are enforced.
+		a) There is already a character with the id 1.
+	
+			INPUT:
+	
+INSERT INTO game_character(char_name, id, description) VALUES
+	('name', 1, 'male half-elf');
+	
+			OUTPUT:
+	
+#1062 - Duplicate entry '1' for key 'PRIMARY'
+
+	
+		
+		
+		b) 	There is no character with the id 25.
+	
+			INPUT:
+	
+INSERT INTO char_spell(char_id, spell_id) VALUES
+	(25, 1);
+	
+			OUTPUT: SQL accepted this for some reason and I am not sure why.
+
+			
+			
+	
+	
+	
+	3-6. All types of join expressions
+		a)INNER - list all characters with items and the items they have
+		
+			INPUT
+		
+SELECT game_character.char_name, item.item_name FROM game_character INNER JOIN item ON game_character.id = item.char_id;
+
+			OUTPUT:
+			
+char_name	item_name	
+Besma	Padded Armor	
+Besma	Club	
+Besma	Health Potion	
+Kenneth	Leather Armor	
+Kenneth	Dagger	
+Gudris	Padded Armor	
+Arnor	Half-plate Armor	
+Arnor	Greatclub	
+Duvamil	Scale mail Armor	
+Duvamil	Shield	
+Duvamil	Shortsword	
+Tosti	Banded mail Armor	
+Asfrid	Sickle	
+Asfrid	Wooden Staff	
+Kalf	Handaxe	
+Kalf	Whip	
+Kalf	Ruby Medalion	
+Gunnlum	Leather Armor	
+Boled	Chainmail Armor	
+Boled	Halberd	
+Boled	Health Potion	
+Hallfred	Hide Armor	
+Hallfred	Greatsword	
+
+		
+	
+
+		b)OUTER - list of all characters and spells known as an outer join
+		
+			INPUT:
+
+SELECT game_character.char_name, char_spell.spell_id FROM
+	game_character FULL OUTER JOIN char_spell ON game_character.id = char_spell.char_id;
+
+			
+			OUTPUT: Error: FULL OUTER JOIN not supported in 
+		
+		
+		
+		
+		
+		c)LEFT OUTER - list of all characters and spells known as a left outer join
+		
+			INPUT:
+
+SELECT game_character.char_name, spell.spell_name FROM
+	game_character LEFT JOIN char_spell ON game_character.id = char_spell.char_id LEFT JOIN spell ON char_spell.spell_id = spell.id;
+			
+			OUTPUT:
+		
+char_name	spell_name	
+Besma	Fire Bolt	
+Besma	Lightning	
+Kenneth	Control Water	
+Kenneth	Invisibility	
+Gudris	Fire Bolt	
+Gudris	Lightning	
+Gudris	Control Water	
+Arnor	Control Water	
+Arnor	Healing Word	
+Arnor	Invisibility	
+Sergei	Lightning	
+Sergei	Control Water	
+Todd		
+Tosti		
+Asfrid	Fire Bolt	
+Asfrid	Lightning	
+Asfrid	Control Water	
+Asfrid	Healing Word	
+Asfrid	Invisibility	
+Kalf		
+Gunnlum	Healing Word	
+Gunnlum	Invisibility	
+Boled		
+Hallfred	Fire Bolt	
+Hallfred	Lightning	
+		
+		
+		
+		
+		d)RIGHT OUTER - list of all characters and spells known as a right outer join
+		
+			INPUT:
+			
+SELECT game_character.char_name, spell.spell_name FROM
+	game_character RIGHT JOIN char_spell ON game_character.id = char_spell.char_id RIGHT JOIN spell ON char_spell.spell_id = spell.id;
+			
+			OUTPUT:
+		
+char_name	spell_name	
+Besma	Fire Bolt	
+Gudris	Fire Bolt	
+Asfrid	Fire Bolt	
+Hallfred	Fire Bolt	
+Besma	Lightning	
+Gudris	Lightning	
+Sergei	Lightning	
+Asfrid	Lightning	
+Hallfred	Lightning	
+Kenneth	Control Water	
+Gudris	Control Water	
+Arnor	Control Water	
+Sergei	Control Water	
+Asfrid	Control Water	
+Arnor	Healing Word	
+Asfrid	Healing Word	
+Gunnlum	Healing Word	
+Kenneth	Invisibility	
+Arnor	Invisibility	
+Asfrid	Invisibility	
+Gunnlum	Invisibility	
+		Wish	
+	
+	
+	
+	
+	
+	
+	7. Renaming - rename some of the characters
+	
+		INPUT:
+		
+UPDATE game_character SET char_name = 'Henry'
+	WHERE id = 6;
+	
+	
+	
+	
+	
+	
+	8. String operations - print names longer than 5 characters
+		
+		INPUT:
+		
+SELECT char_name FROM game_character WHERE LENGTH(char_name) > 5;
+	
+		OUTPUT:
+		
+char_name	
+Kenneth	
+Gudris	
+Sergei	
+Asfrid	
+Gunnlum	
+Hallfred	
+	
+	
+	
+	
+	
+	
+	9. Group by AND aggregation - list each character and their total number of spells
+
+		INPUT:
+		
+SELECT game_character.char_name, COUNT(spell.id) AS spell_count FROM
+	game_character LEFT JOIN char_spell ON game_character.id = char_spell.char_id LEFT JOIN spell ON char_spell.spell_id = spell.id GROUP BY game_character.id;
+	
+		OUTPUT:
+		
+char_name	spell_count	
+Besma	2	
+Kenneth	2	
+Gudris	3	
+Arnor	3	
+Sergei	2	
+Todd	0	
+Tosti	0	
+Asfrid	5	
+Kalf	0	
+Gunnlum	2	
+Boled	0	
+Hallfred	2	
+
+
+
+
+
+	
+	10. having - list characters with three or more spells
+	
+		INPUT:
+		
+SELECT game_character.char_name, COUNT(spell.id) AS spell_count FROM
+	game_character LEFT JOIN char_spell ON game_character.id = char_spell.char_id LEFT JOIN spell ON char_spell.spell_id = spell.id 
+	GROUP BY game_character.id
+	HAVING COUNT(spell.id) > 2;
+	
+		OUTPUT:
+		
+char_name	spell_count	
+Gudris	3	
+Arnor	3	
+Asfrid	5	
+
+	
+	
+	
+	
+	
+	11. order by - order the characters by name
+	
+		INPUT:
+		
+SELECT id, char_name FROM game_character ORDER BY char_name;
+	
+		OUTPUT;
+		
+id	char_name   	
+4	Arnor	
+8	Asfrid	
+1	Besma	
+11	Boled	
+3	Gudris	
+10	Gunnlum	
+12	Hallfred	
+9	Kalf	
+2	Kenneth	
+5	Sergei	
+6	Todd	
+7	Tosti	
+
+
+
+	
+	
+	
+	12. set union - list characters with the spell of id 1 or 2
+	
+		INPUT:
+		
+SELECT game_character.char_name, spell.spell_name FROM 
+	game_character JOIN char_spell ON game_character.id = char_spell.char_id JOIN spell ON char_spell.spell_id = spell.id WHERE
+	spell.id = 1
+UNION
+SELECT game_character.char_name, spell.spell_name FROM 
+	game_character JOIN char_spell ON game_character.id = char_spell.char_id JOIN spell ON char_spell.spell_id = spell.id WHERE
+	spell.id = 2;
+
+		OUTPUT:
+		
+char_name	spell_name	
+Besma	Fire Bolt	
+Gudris	Fire Bolt	
+Asfrid	Fire Bolt	
+Hallfred	Fire Bolt	
+Besma	Lightning	
+Gudris	Lightning	
+Sergei	Lightning	
+Asfrid	Lightning	
+Hallfred	Lightning	
+
+	
+	
+	
+	
+	
+	13. intersection - list characters with the spell of id 1 and 2
+	
+		INPUT:
+	
+SELECT game_character.char_name, spell.spell_name FROM 
+	game_character JOIN char_spell ON game_character.id = char_spell.char_id JOIN spell ON char_spell.spell_id = spell.id WHERE
+	spell.id = 1
+INTERSECT
+SELECT game_character.char_name, spell.spell_name FROM 
+	game_character JOIN char_spell ON game_character.id = char_spell.char_id JOIN spell ON char_spell.spell_id = spell.id WHERE
+	spell.id = 2;
+	
+		OUTPUT: Error, mysql doesn't support INTERSECT
+	
+	
+	
+	
+	
+	
+	14. minus - list of characters with spell of id 1 but not spell of id 2
+	
+		INPUT:
+		
+SELECT game_character.char_name, spell.spell_name FROM 
+	game_character JOIN char_spell ON game_character.id = char_spell.char_id JOIN spell ON char_spell.spell_id = spell.id WHERE
+	spell.id = 1
+MINUS
+SELECT game_character.char_name, spell.spell_name FROM 
+	game_character JOIN char_spell ON game_character.id = char_spell.char_id JOIN spell ON char_spell.spell_id = spell.id WHERE
+	spell.id = 2;
+
+			OUTPUT: Error, mysql doesn't support MINUS
+
+			
+			
+			
 	
 	
-	2. All types of join expressions discussed in chap 4 including outer joins
+	15. nested queries: set membership - list parties with positive associations with organizations
 	
+		INPUT:
+		
+SELECT party.party_name, association.relation, organization.org_name FROM
+	party JOIN association ON party.id = association.party_id JOIN organization ON association.org_id = organization.id WHERE association.relation > (
+	SELECT relation FROM association);
+
+		OUTPUT:
+
+party_name	relation	org_name	
+Players	7	Riverton Guards	
+Players	1	Riverton Miners	
+Bandits	9	Westburrow Theives	
+Guards	10	Riverton Guards	
+
 	
-	3. Renaming
 	
 	
-	4. String operations
 	
 	
-	5. Group by
+	16. nested queries: set comparison
 	
+		INPUT:
 	
-	6. aggregating
+?
 	
 	
-	7. having
 	
 	
-	8. order by
 	
 	
-	9. set union
+	17. testing for empty relation - list all characters who know spells
 	
+		INPUT:
+		
+SELECT game_character.char_name FROM game_character WHERE EXISTS(
+	SELECT * FROM char_spell WHERE game_character.id = char_spell.char_id);
 	
-	10. intersection
+		OUTPUT:
+		
+char_name	
+Besma	
+Kenneth	
+Gudris	
+Arnor	
+Sergei	
+Asfrid	
+Gunnlum	
+Hallfred	
+
+
+
+
+
 	
+	18. absence of duplicate tuples
 	
-	11. minus
+		INPUT:
+		
+?
+
+
 	
 	
-	12. nested queries
 	
 	
-	13. for set membership
+	19. nested queries in the from clause - find the average armor class
 	
+		INPUT:
+		
+?
+
+
+
+
 	
-	14. set comparison
 	
+	20 with clause
 	
-	15. testing for empty relation and
+		INPUT:
+		
+?
 	
 	
-	16. absence of duplicate tuples
 	
 	
-	17. nested queries in the from clause
+
 	
+	21. deletion of tuples
 	
-	18 with clause
+		INPUT:
+		
+DELETE FROM item WHERE item.char_id = 11 AND item.num = 3;
 	
 	
-	19. deletion of tuples
 	
 	
-	20. updating of tuples
 	
 	
-	21. inserting of tuples selected from one table into another table
+	22. updating of tuples
+
+		INPUT:
+
+UPDATE association SET relation = -9
+	WHERE org_id = 2 AND party_id = 2;
+
 	
 	
 	
 	
 	
+	23. inserting of tuples selected from one table into another table
 	
+		INPUT:
+		
+?
 	
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 *****************************************
 * Original SQL Specificans from Phase 1 *
