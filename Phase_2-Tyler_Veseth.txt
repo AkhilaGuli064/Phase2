@@ -1,3 +1,12 @@
+*************
+* Team Info *
+*************
+
+	Tyler Veseth
+	Team with one member
+	Responsible for all tables
+	
+
 *********************
 * Total Tuple Tally *
 *********************
@@ -13,6 +22,7 @@ char_party - 12
 orginization - 3
 location - 5
 association - 9
+
 
 
 
@@ -253,3 +263,221 @@ INSERT INTO association(party_id, org_id, relation) VALUES
 	(3, 1, -10),
 	(3, 2, 10),
 	(3, 3, -1);
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+***************
+* SQL Queries *
+***************
+
+	1. Queries that show that constraints(primary key, foreign key, unique, and check) are enforced.
+	
+	
+	2. All types of join expressions discussed in chap 4 including outer joins
+	
+	
+	3. Renaming
+	
+	
+	4. String operations
+	
+	
+	5. Group by
+	
+	
+	6. aggregating
+	
+	
+	7. having
+	
+	
+	8. order by
+	
+	
+	9. set union
+	
+	
+	10. intersection
+	
+	
+	11. minus
+	
+	
+	12. nested queries
+	
+	
+	13. for set membership
+	
+	
+	14. set comparison
+	
+	
+	15. testing for empty relation and
+	
+	
+	16. absence of duplicate tuples
+	
+	
+	17. nested queries in the from clause
+	
+	
+	18 with clause
+	
+	
+	19. deletion of tuples
+	
+	
+	20. updating of tuples
+	
+	
+	21. inserting of tuples selected from one table into another table
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+*****************************************
+* Original SQL Specificans from Phase 1 *
+*****************************************
+
+
+
+CREATE TABLE organization (
+id int 					NOT NULL, 
+name varchar(20) 			NOT NULL, 
+description varchar(60), 
+PRIMARY KEY(id)
+);
+
+CREATE TABLE location (
+organization_id int 			NOT NULL, 
+location varchar(20), 
+FOREIGN KEY(organization_id) REFERENCES organization(id),
+ON DELETE CASCADE
+);
+
+CREATE TABLE association (
+	org_id int				NOT NULL,
+	party_id int				NOT NULL,
+	relation int				NOT NULL,
+FOREIGN KEY(org_id) REFERENCES organization(id),
+FOREIGN KEY(party_id) REFERENCES party(id)
+);
+
+CREATE TABLE party (
+	id int					NOT NULL,
+	name varchar(20)			NOT NULL,
+	color char(6),
+	PRIMARTY KEY(id)
+);
+
+CREATE TABLE char_party (
+	char_id int				NOT NULL,
+	party_id int				NOT NULL,
+FOREIGN KEY(char_id) REFERENCES character(id),
+FOREIGN KEY(party_id) REFERENCES party(id)
+);
+
+CREATE TABLE character (
+	id int					NOT NULL,
+	name varchar(20)			NOT NULL,
+	description varchar(60),
+	PRIMARTY KEY(id)
+);
+
+CREATE TABLE char_spell (
+	char_id int				NOT NULL,
+	spell_id int				NOT NULL,
+FOREIGN KEY(char_id) REFERENCES character(id),
+FOREIGN KEY(spell_id) REFERENCES spell(id)
+);
+
+CREATE TABLE spell (
+	id int					NOT NULL,
+	name varchar(20)			NOT NULL,
+	description varchar(60),
+	PRIMARTY KEY(id)
+);
+
+CREATE TABLE item (
+	char_id int				NOT NULL,
+number int		 		NOT NULL,
+name varchar(20)			NOT NULL,
+weight int,
+description varchar(60),
+PRIMARY KEY(number),
+FOREIGN KEY(char_id) REFERENCES character(id),
+ON DELETE CASCADE
+);
+
+CREATE TABLE weapon (
+	char_id int				NOT NULL,
+	number int				NOT NULL,
+	type varchar(10)			NOT NULL,
+	damage int				NOT NULL,
+FOREIGN KEY(char_id) REFERENCES character(id),
+	FOREIGN KEY(number) REFERENCES item(number)
+);
+
+CREATE TABLE armor (
+	char_id int				NOT NULL,
+	number int				NOT NULL,
+	class int				NOT NULL,
+FOREIGN KEY(char_id) REFERENCES character(id),
+	FOREIGN KEY(number) REFERENCES item(number)
+);
+
+
+
+
+***********
+* Changes *
+***********
+
+	1. There are three instances of the word PRIMARY where somehow in my word document it was saved as PRIMARTY. Once the T's were removed the
+	script ran as expected however I am not sure how they got there in the first place.
+	
+	2. In the location, association, char_party, char_spell, weapon and armor tables, I thought that declaring the FOREIGN keys would be enough,
+	however I needed to create primary keys as well. While technically It worked, it wasn't initialized the way that I had wanted.
+	
+	3. I renamed the location key organization_id to org_id just to simplify it.
