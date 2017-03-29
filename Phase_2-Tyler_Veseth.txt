@@ -1,0 +1,255 @@
+*********************
+* Total Tuple Tally *
+*********************
+
+chars - 12
+items - 10 + 10 + 4
+armor - 10
+weapon - 10
+spell - 5
+char_spell - 22
+party - 3
+char_party - 12
+orginization - 3
+location - 5
+association - 9
+
+
+
+********************************
+* Generate and Populate Tables *
+********************************
+
+
+CREATE TABLE organization (
+id int 						NOT NULL, 
+org_name varchar(20) 		NOT NULL, 
+description varchar(60), 	
+PRIMARY KEY(id)
+);
+
+CREATE TABLE location (
+org_id int 					NOT NULL, 
+location varchar(20), 
+PRIMARY KEY(org_id, location),
+FOREIGN KEY(org_id) REFERENCES organization(id)
+);
+
+CREATE TABLE association (
+	org_id int				NOT NULL,
+	party_id int			NOT NULL,
+	relation int			NOT NULL,
+PRIMARY KEY(org_id, party_id),
+FOREIGN KEY(org_id) REFERENCES organization(id),
+FOREIGN KEY(party_id) REFERENCES party(id)
+);
+
+CREATE TABLE party (
+	id int					NOT NULL,
+	party_name varchar(20)	NOT NULL,
+	color char(6),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE char_party (
+	char_id int				NOT NULL,
+	party_id int			NOT NULL,
+PRIMARY KEY(char_id, party_id),
+FOREIGN KEY(char_id) REFERENCES game_character(id),
+FOREIGN KEY(party_id) REFERENCES party(id)
+);
+
+CREATE TABLE game_character (
+	id int					NOT NULL,
+	char_name varchar(20)	NOT NULL,
+	description varchar(60),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE char_spell (
+	char_id int				NOT NULL,
+	spell_id int			NOT NULL,
+PRIMARY KEY(char_id, spell_id),
+FOREIGN KEY(char_id) REFERENCES game_character(id),
+FOREIGN KEY(spell_id) REFERENCES spell(id)
+);
+
+CREATE TABLE spell (
+	id int					NOT NULL,
+	spell_name varchar(20)	NOT NULL,
+	description varchar(60),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE item (
+	char_id int				NOT NULL,
+	num int		 			NOT NULL,
+	item_name varchar(20)	NOT NULL,
+	weight int,
+	description varchar(60),
+	PRIMARY KEY(char_id, num),
+	FOREIGN KEY(char_id) REFERENCES game_character(id)
+);
+
+CREATE TABLE weapon (
+	char_id int				NOT NULL,
+	num int					NOT NULL,
+	damage_type varchar(12)	NOT NULL,
+	damage int				NOT NULL,
+	PRIMARY KEY(char_id, num),
+	FOREIGN KEY(char_id) REFERENCES item(char_id),
+	FOREIGN KEY(num) REFERENCES item(num)
+);
+
+CREATE TABLE armor (
+	char_id int				NOT NULL,
+	num int					NOT NULL,
+	class int				NOT NULL,
+	PRIMARY KEY(char_id, num),
+	FOREIGN KEY(char_id) REFERENCES item(char_id),
+	FOREIGN KEY(num) REFERENCES item(num)
+);
+
+
+
+
+
+
+INSERT INTO game_character(char_name, id, description) VALUES
+	('name', 1, 'female human'),
+	('name', 2, 'male human'),
+	('name', 3, 'female elf'),
+	('name', 4, 'male half-elf'),
+	('name', 5, 'male dwarf'),
+	('name', 6, 'female half-orc'),
+	('name', 7, 'female halfling'),
+	('name', 8, 'female half-elf'),
+	('name', 9, 'male elf'),
+	('name', 10, 'male elf'),
+	('name', 11, 'male dwarf'),
+	('name', 12, 'male halfling');
+	
+INSERT INTO item(char_id, num, item_name, weight, description) VALUES
+	(1, 1, 'Padded Armor', 10, 'light, stealth disadvantage'),
+	(2, 1, 'Leather Armor', 15, 'light'),
+	(3, 1, 'Padded Armor', 10, 'light, stealth disadvantage'),
+	(4, 1, 'Half-plate Armor', 50, 'medium, stealth disadvantage'),
+	(6, 1, 'Scale mail Armor', 30, 'medium, stealth disadvantage'),
+	(6, 2, 'Shield', 6, 'light steel'),
+	(7, 1, 'Banded mail Armor', 35, 'medium'),
+	(10, 1, 'Leather Armor', 15, 'light'),
+	(11, 1, 'Chainmail Armor', 40, 'heavy, stealth disadvantage, Str 13'),
+	(12, 1, 'Hide Armor', 25, 'medium'),
+	
+	(1, 2, 'Club', 2, 'light'),
+	(2, 2, 'Dagger', 1, 'finesse, light, thrown'),
+	(4, 2, 'Greatclub', 10, 'two-handed'),
+	(5, 2, 'Light Hammer', 2, 'light, thrown'),
+	(6, 3, 'Shortsword', 2, 'finesse, light'),
+	(8, 2, 'Sickle', 2, 'light'),
+	(9, 2, 'Handaxe', 2, 'light, thrown'),
+	(9, 3, 'Whip', 3, 'finesse, reach'),
+	(11, 2, 'Halberd', 6, 'heavy, reach, two-handed'),
+	(12, 2, 'Greatsword', 6, 'heavy, two-handed'),
+	
+	(1, 3, 'Health Potion', 1, 'heals 5 damage'),
+	(8, 3, 'Wooden Staff', 2, 'wooden staff used for walking'),
+	(9, 4, 'Ruby Medalion', 1, 'decorative medalion worth 50 gold'),
+	(11, 3, 'Health Potion', 1, 'heals 5 damage');
+
+INSERT INTO armor(char_id, num, class) VALUES
+	(1, 1, 11),
+	(2, 1, 11),
+	(3, 1, 11),
+	(4, 1, 15),
+	(6, 1, 14),
+	(6, 2, 2),
+	(7, 1, 13),
+	(10, 1, 11),
+	(11, 1, 16),
+	(12, 1, 12);
+	
+INSERT INTO weapon(char_id, num, damage, damage_type) VALUES
+	(1, 2, 4, 'bludgeoning'),
+	(2, 2, 4, 'piercing'),
+	(4, 2, 8, 'bludgeoning'),
+	(5, 2, 4, 'bludgeoning'),
+	(6, 3, 6, 'piercing'),
+	(8, 2, 4, 'slashing'),
+	(9, 2, 6, 'slashing'),
+	(9, 3, 4, 'slashing'),
+	(11, 2, 10, 'slashing'),
+	(12, 2, 12, 'slashing');
+	
+INSERT INTO spell(id, spell_name, description) VALUES
+	(1, 'Fire Bolt', '120 feet, 10 damage'),
+	(2, 'Lightning', '100 feet, 48 damage'),
+	(3, 'Control Water', 'Concentration, 10 minutes'),
+	(4, 'Healing Word', '60 feet, 4 healing'),
+	(5, 'Invisibility', 'Conventration, 1 hour');
+	
+INSERT INTO char_spell(char_id, spell_id) VALUES
+	(1, 1),
+	(1, 2),
+	(2, 3),
+	(2, 5),
+	(3, 1),
+	(3, 2),
+	(3, 3),
+	(4, 3),
+	(4, 4),
+	(4, 5),
+	(5, 2),
+	(5, 3),
+	(7, 2),
+	(8, 1),
+	(8, 2),
+	(8, 3),
+	(8, 4),
+	(8, 5),
+	(10, 4),
+	(10, 5),
+	(12, 1),
+	(12, 2);
+	
+INSERT INTO party(id, party_name, color) VALUES
+	(1, 'Players', '00ff00'),
+	(2, 'Bandits', 'ff0000'),
+	(3, 'Guards', '0000ff');
+
+INSERT INTO char_party(party_id, char_id) VALUES
+	(1, 1),
+	(1, 2),
+	(1, 3),
+	(1, 4),
+	(2, 5),
+	(2, 6),
+	(2, 7),
+	(1, 8),
+	(3, 9),
+	(3, 10),
+	(3, 11),
+	(3, 12);
+	
+INSERT INTO organization(id, org_name, description) VALUES
+	(1, 'Westburrow Theives', 'The band of thieves living in Wetburrow Hollow'),
+	(2, 'Riverton Guards', 'The local authorities from Riverton'),
+	(3, 'Riverton Miners', 'The workers of the Riverton mining camp');
+	
+INSERT INTO location(org_id, location) VALUES
+	(1, 'Westburrow Hollow'),
+	(2, 'Riverton'),
+	(2, 'Riverton Mines'),
+	(3, 'Riverton'),
+	(3, 'Riverton Mines');
+
+INSERT INTO association(party_id, org_id, relation) VALUES
+	(1, 1, -3),
+	(1, 2, 7),
+	(1, 3, 1),
+	(2, 1, 9),
+	(2, 2, -8),
+	(2, 3, -3),
+	(3, 1, -10),
+	(3, 2, 10),
+	(3, 3, -1);
