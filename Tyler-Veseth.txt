@@ -5,47 +5,30 @@
 	Tyler Veseth
 	Team with one member
 	Responsible for all tables
+
 	
-
-*********************
-* Total Tuple Tally *
-*********************
-
-chars - 12
-items - 10 + 10 + 4
-armor - 10
-weapon - 10
-spell - 5
-char_spell - 22
-party - 3
-char_party - 12
-orginization - 3
-location - 5
-association - 9
-
-
-
-
+	
+	
 ********************************
 * Generate and Populate Tables *
 ********************************
 
 
-CREATE TABLE organization (
+CREATE TABLE IF NOT EXISTS organization (
 id int 						NOT NULL, 
 org_name varchar(20) 		NOT NULL, 
 description varchar(60), 	
 PRIMARY KEY(id)
 );
 
-CREATE TABLE location (
+CREATE TABLE IF NOT EXISTS location (
 org_id int 					NOT NULL, 
 location varchar(20), 
 PRIMARY KEY(org_id, location),
 FOREIGN KEY(org_id) REFERENCES organization(id)
 );
 
-CREATE TABLE association (
+CREATE TABLE IF NOT EXISTS association (
 	org_id int				NOT NULL,
 	party_id int			NOT NULL,
 	relation int			NOT NULL,
@@ -54,14 +37,14 @@ FOREIGN KEY(org_id) REFERENCES organization(id),
 FOREIGN KEY(party_id) REFERENCES party(id)
 );
 
-CREATE TABLE party (
+CREATE TABLE IF NOT EXISTS party (
 	id int					NOT NULL,
 	party_name varchar(20)	NOT NULL,
 	color char(6),
 	PRIMARY KEY(id)
 );
 
-CREATE TABLE char_party (
+CREATE TABLE IF NOT EXISTS char_party (
 	char_id int				NOT NULL,
 	party_id int			NOT NULL,
 PRIMARY KEY(char_id, party_id),
@@ -69,14 +52,14 @@ FOREIGN KEY(char_id) REFERENCES game_character(id),
 FOREIGN KEY(party_id) REFERENCES party(id)
 );
 
-CREATE TABLE game_character (
+CREATE TABLE IF NOT EXISTS game_character (
 	id int					NOT NULL,
 	char_name varchar(20)	NOT NULL,
 	description varchar(60),
 	PRIMARY KEY(id)
 );
 
-CREATE TABLE char_spell (
+CREATE TABLE IF NOT EXISTS char_spell (
 	char_id int				NOT NULL,
 	spell_id int			NOT NULL,
 PRIMARY KEY(char_id, spell_id),
@@ -84,14 +67,14 @@ FOREIGN KEY(char_id) REFERENCES game_character(id),
 FOREIGN KEY(spell_id) REFERENCES spell(id)
 );
 
-CREATE TABLE spell (
+CREATE TABLE IF NOT EXISTS spell (
 	id int					NOT NULL,
 	spell_name varchar(20)	NOT NULL,
 	description varchar(60),
 	PRIMARY KEY(id)
 );
 
-CREATE TABLE item (
+CREATE TABLE IF NOT EXISTS item (
 	char_id int				NOT NULL,
 	num int		 			NOT NULL,
 	item_name varchar(20)	NOT NULL,
@@ -101,7 +84,7 @@ CREATE TABLE item (
 	FOREIGN KEY(char_id) REFERENCES game_character(id)
 );
 
-CREATE TABLE weapon (
+CREATE TABLE IF NOT EXISTS weapon (
 	char_id int				NOT NULL,
 	num int					NOT NULL,
 	damage_type varchar(12)	NOT NULL,
@@ -111,7 +94,7 @@ CREATE TABLE weapon (
 	FOREIGN KEY(num) REFERENCES item(num)
 );
 
-CREATE TABLE armor (
+CREATE TABLE IF NOT EXISTS armor (
 	char_id int				NOT NULL,
 	num int					NOT NULL,
 	class int				NOT NULL,
@@ -634,8 +617,17 @@ Guards	10	Riverton Guards
 	
 		INPUT:
 	
-?
+SELECT party.party_name, association.relation, organization.org_name FROM
+	party JOIN association ON party.id = association.party_id JOIN organization ON association.org_id = organization.id WHERE association.relation >some (
+	SELECT relation FROM association WHERE party.id = 1);
 	
+		OUTPUT:
+	
+party_name	relation	org_name	
+Players	-3	Westburrow Theives	
+Players	7	Riverton Guards	
+Players	1	Riverton Miners	
+
 	
 	
 	
@@ -665,40 +657,22 @@ Hallfred
 
 
 	
-	18. absence of duplicate tuples
+
+	18. nested queries in the from clause - find the average armor class
 	
-		INPUT:
+		unable to use FROM () without errors
+
+
+
+
+	19 with clause
+	
+		not supported in MySQL, not sure how to implement it
+
 		
-?
-
-
-	
-	
-	
-	
-	19. nested queries in the from clause - find the average armor class
-	
-		INPUT:
 		
-?
-
-
-
-
 	
-	
-	20 with clause
-	
-		INPUT:
-		
-?
-	
-	
-	
-	
-
-	
-	21. deletion of tuples
+	20. deletion of tuples
 	
 		INPUT:
 		
@@ -709,27 +683,31 @@ DELETE FROM item WHERE item.char_id = 11 AND item.num = 3;
 	
 	
 	
-	22. updating of tuples
+	21. updating of tuples
 
 		INPUT:
 
 UPDATE association SET relation = -9
 	WHERE org_id = 2 AND party_id = 2;
 
+
 	
 	
-	
-	
-	
-	23. inserting of tuples selected from one table into another table
+	22. List all unarmored characters
 	
 		INPUT:
 		
-?
+SELECT game_character.char_name FROM game_character WHERE NOT EXISTS (
+	SELECT * FROM armor WHERE game_character.id = armor.char_id);
 	
+	OUTPUT:
 	
-	
-	
+char_name	
+Sergei	
+Asfrid	
+Kalf	
+
+
 
 	
 *****************************************
